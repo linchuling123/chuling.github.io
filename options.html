@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>笔试</title>
+    <!-- <style>
+        #columns {
+            margin: 1rem;
+            /* margin-right: 1rem; */
+        }
+
+        ul {
+            /* width: 100%; */
+            height: 15rem;
+            display: block;
+            padding-inline-start: 0px;
+            margin-block-start: 0em;
+            margin-block-end: 0em;
+        }
+
+        ul li {
+            list-style-type: none;
+            height: 3rem;
+            /* width: 100%; */
+            margin: 1rem 0rem;
+            padding-left: 0.5rem;
+            background-color: honeydew;
+            display: flex;
+            align-items: center;
+        }
+    </style> -->
+    <style>
+        #main {
+            width: 100%;
+            height: 20rem;
+            margin: 1rem 0rem;
+            padding: 0;
+            background: #fff;
+            position: relative;
+        }
+
+        div.list {
+            height: 3rem;
+            margin-top: 1rem;
+            background: honeydew;
+            display: flex;
+            align-items: center;
+            padding-left: 1rem;
+        }
+
+        div.drag {
+            position: absolute;
+            width: 100%;
+            background: blue;
+            text-align: center;
+            height: 3rem;
+            opacity: 0.5;
+        }
+
+        .btn {
+            background-color: blue;
+            width: 100%;
+            height: 3rem;
+            margin-top: 3rem;
+            border-radius: 3rem;
+            color: #fff;
+            border-color: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="list">选项A</div>
+        <div class="list">选项B</div>
+        <div class="list">选项C</div>
+        <div class="list">选项D</div>
+    </div>
+
+    <button id="btn" class="btn" type="submit">提交</button>
+</body>
+<script>
+    var div = g('#main');
+    var mTop = div.offsetTop;
+    var flag = 0;
+    var drag = {
+        curr: null,
+        tTop: 0,
+        num: 0
+    };
+
+    div.addEventListener('mousedown', function (e) {
+        flag = 1;
+        var curr = e.target;
+        var top = (curr.offsetTop - mTop) + 'px';
+        var y = e.pageY - curr.offsetTop; 
+        drag.tTop = y;
+        var newDiv = div.removeChild(curr);
+        newDiv.setAttribute('class', 'drag');
+        newDiv.style.top = top;
+        newDiv.style.left = 0;
+        div.appendChild(newDiv);
+        drag.curr = curr;
+    });
+
+    div.addEventListener('mousemove', function (e) {
+        if (!flag) { 
+            return false;
+        } else {
+            var curr = g('.drag')[0];
+            curr.style.top = (e.pageY - drag.tTop - mTop) + 'px';
+            var ratio = (e.pageY - drag.tTop - mTop) % 53;
+            if (ratio <= 5) {
+                curr.borderTop = '2px solid green';
+                drag.num = Math.floor((e.pageY - drag.tTop - mTop) / 53);
+            }
+        }
+    });
+
+    div.addEventListener('mouseup', function (e) {
+        div.insertBefore(drag.curr, div.children[drag.num]); 
+        drag.curr.setAttribute('class', 'list'); 
+        var bgc = drag.curr.style.background;
+        drag.curr.style = null;
+        if(bgc == "blue") {
+            drag.curr.style = "background: honeydew;"
+        } else {
+            drag.curr.style = "background: blue;";
+        }
+        flag = 0;
+    })
+
+    function g(str) {
+        if (/^#.+/.test(str)) {
+            str = str.slice(1);
+            return document.getElementById(str);
+        } else if (/^\..+/.test(str)) {
+            str = str.slice(1);
+            return document.getElementsByClassName(str);
+        } else {
+            return document.getElementsByTagName(str);
+        }
+    }
+
+    var btn = document.getElementById("btn");
+    btn.onclick = function () {
+        var x = document.getElementsByClassName("list");
+        var i;
+        var arr = [], selectArr = [];
+        for (i = 0; i < x.length; i++) {
+            arr.push(x[i].innerText);
+            console.log(x[i].style.background);
+            if (x[i].style.background == "blue") {
+                selectArr.push(x[i].innerText);
+            }
+        }
+        if (selectArr.length != 0) {
+            alert("排序结果为：" + arr + ",选中选项为：" + selectArr)
+        } else {
+            alert("排序结果为：" + arr + "，无选中选项。")
+        }
+    }
+</script>
+
+</html>
